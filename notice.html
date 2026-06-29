@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>通知公告 | 甄果黔荟 · 刺梨复合果蔬汁</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+      background: #f5f6fa;
+      color: #2d2d2d;
+      overflow-x: hidden;
+    }
+    :root {
+      --yellow: #f9c41a;
+      --orange: #f47f20;
+      --deep-orange: #d45f00;
+      --green: #5aab3e;
+      --dark-green: #2d6e1a;
+      --cream: #fffbee;
+      --brown: #7b3f00;
+      --primary: #e74c3c;
+      --primary-dark: #c0392b;
+      --primary-light: #ff6b6b;
+    }
+
+    /* 导航栏 */
+    nav {
+      position: fixed;
+      top: 0; left: 0; width: 100%; z-index: 1000;
+      background: rgba(255,255,255,0.98);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 6%;
+      height: 64px;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .nav-logo-icon {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, var(--yellow), var(--orange));
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+    }
+    .nav-logo-text {
+      font-size: 20px; font-weight: 800;
+      background: linear-gradient(135deg, var(--orange), var(--dark-green));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 2px;
+    }
+    .nav-links {
+      display: flex; gap: 32px; list-style: none;
+    }
+    .nav-links a {
+      text-decoration: none; color: #444; font-size: 15px; font-weight: 500;
+      position: relative; transition: color 0.3s;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute; bottom: -4px; left: 0;
+      width: 0; height: 2px;
+      background: var(--orange);
+      transition: width 0.3s;
+    }
+    .nav-links a:hover { color: var(--orange); }
+    .nav-links a:hover::after { width: 100%; }
+
+    /* 红色顶部横幅 */
+    .page-header {
+      padding: 100px 6% 60px;
+      text-align: center;
+      background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, var(--primary-light) 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .page-header::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.15) 0%, transparent 50%),
+                  radial-gradient(ellipse at 70% 80%, rgba(0,0,0,0.1) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .page-header .bell-icon {
+      width: 60px; height: 60px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px;
+      margin: 0 auto 16px;
+      animation: bellRing 2.5s ease-in-out infinite;
+      position: relative;
+      z-index: 1;
+    }
+    @keyframes bellRing {
+      0%, 90%, 100% { transform: rotate(0deg); }
+      92% { transform: rotate(-15deg); }
+      95% { transform: rotate(15deg); }
+      97% { transform: rotate(-8deg); }
+      99% { transform: rotate(8deg); }
+    }
+    .page-header h1 {
+      font-size: 36px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 10px;
+      position: relative;
+      z-index: 1;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .page-header p {
+      font-size: 15px;
+      color: rgba(255,255,255,0.85);
+      position: relative;
+      z-index: 1;
+    }
+
+    /* 页面主体 */
+    .page-body {
+      max-width: 900px;
+      margin: -30px auto 60px;
+      padding: 0 6%;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* 最新公告卡片 */
+    .latest-notice {
+      background: #fff;
+      border-radius: 16px;
+      padding: 28px 32px 32px;
+      margin-bottom: 32px;
+      box-shadow: 0 8px 32px rgba(231,76,60,0.12);
+      border-top: 4px solid var(--primary);
+    }
+    .latest-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 20px;
+      margin-bottom: 16px;
+    }
+    .latest-notice .notice-date {
+      font-size: 14px;
+      color: #999;
+      margin-bottom: 12px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .latest-notice h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #2d2d2d;
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+    .latest-notice .notice-content {
+      font-size: 15px;
+      color: #555;
+      line-height: 1.9;
+      margin-bottom: 24px;
+    }
+    .latest-notice .notice-content p {
+      margin-bottom: 12px;
+    }
+    .latest-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 20px;
+      border-top: 1px dashed #eee;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .contact-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: #666;
+    }
+    .contact-info .phone {
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 16px;
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 24px;
+      border-radius: 24px;
+      text-decoration: none;
+      box-shadow: 0 4px 16px rgba(231,76,60,0.35);
+      transition: transform 0.2s, box-shadow 0.2s;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(231,76,60,0.45);
+    }
+
+    /* 历史公告 */
+    .history-section {
+      background: #fff;
+      border-radius: 16px;
+      padding: 24px 0 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+    .history-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 28px 16px;
+      border-bottom: 2px solid #f0f0f0;
+      margin-bottom: 8px;
+    }
+    .history-header .icon {
+      font-size: 18px;
+    }
+    .history-header h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #333;
+    }
+    .history-list {
+      list-style: none;
+    }
+    .history-item {
+      display: flex;
+      align-items: center;
+      padding: 16px 28px;
+      border-bottom: 1px solid #f5f5f5;
+      cursor: pointer;
+      transition: background 0.2s;
+      text-decoration: none;
+    }
+    .history-item:last-child { border-bottom: none; }
+    .history-item:hover {
+      background: #fafafa;
+    }
+    .history-item .item-date {
+      flex-shrink: 0;
+      width: 90px;
+      font-size: 14px;
+      color: #999;
+    }
+    .history-item .item-title {
+      flex: 1;
+      font-size: 15px;
+      color: #333;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .history-item .item-arrow {
+      flex-shrink: 0;
+      width: 28px; height: 28px;
+      background: #f5f5f5;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+      color: #ccc;
+      transition: all 0.2s;
+    }
+    .history-item:hover .item-arrow {
+      background: var(--primary);
+      color: #fff;
+      transform: translateX(4px);
+    }
+
+    /* 分页 */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 24px;
+    }
+    .pagination .btn {
+      padding: 8px 16px;
+      font-size: 14px;
+      color: #666;
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .pagination .btn:hover:not(:disabled) {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    .pagination .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .pagination .page-num {
+      min-width: 36px;
+      height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+      color: #666;
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .pagination .page-num:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    .pagination .page-num.active {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #fff;
+      border-color: var(--primary);
+    }
+    .pagination .page-info {
+      font-size: 13px;
+      color: #999;
+      margin-left: 12px;
+    }
+
+    /* 页脚 */
+    footer {
+      text-align: center;
+      padding: 40px 6%;
+      background: #fafafa;
+      color: #999;
+      font-size: 13px;
+    }
+    footer a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    @media (max-width: 640px) {
+      .page-header { padding: 90px 6% 50px; }
+      .page-header h1 { font-size: 28px; }
+      .latest-notice { padding: 20px; }
+      .latest-notice h2 { font-size: 17px; }
+      .latest-footer { flex-direction: column; align-items: flex-start; }
+      .history-item { padding: 14px 20px; }
+      .history-item .item-date { width: 80px; font-size: 13px; }
+      .history-item .item-title { font-size: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- 导航栏 -->
+<nav>
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-icon">🌿</div>
+    <span class="nav-logo-text">甄果黔荟</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">首页</a></li>
+    <li><a href="index.html#features">产品</a></li>
+    <li><a href="index.html#about">关于</a></li>
+  </ul>
+</nav>
+
+<!-- 红色顶部横幅 -->
+<div class="page-header">
+  <div class="bell-icon">🔔</div>
+  <h1>通知公告</h1>
+  <p>贵州得一健康管理有限公司官方公告 · 重要通知、优惠活动、产品上新等信息</p>
+</div>
+
+<!-- 页面主体 -->
+<div class="page-body">
+
+  <!-- 最新公告 -->
+  <div class="latest-notice" id="latest">
+    <div class="latest-badge">🔥 最新公告</div>
+    <div class="notice-date">📅 2026-06-26</div>
+    <h2>甄果黔荟刺梨复合果蔬汁荣获第三方权威机构质量认证</h2>
+    <div class="notice-content">
+      <p>2026年3月，甄果黔荟刺梨复合果蔬汁通过SGS及中国检验认证集团（CCIC）双重质量检测认证，涵盖重金属、农残、微生物等多项指标，全部符合国家标准。</p>
+      <p>本次认证历时三个月，检测项目多达68项，其中维生素C含量检测值为1320mg/100g，远超同类产品平均水平。SOD活性酶检测结果同样亮眼，证明产品在加工过程中有效保留了刺梨的核心营养成分，消费者可放心饮用。</p>
+    </div>
+    <div class="latest-footer">
+      <div class="contact-info">
+        <span>📞 如有疑问请联系客服：</span>
+        <span class="phone">400-888-8899</span>
+      </div>
+      <a href="#" class="btn-primary">💬 立即咨询 →</a>
+    </div>
+  </div>
+
+  <!-- 历史公告 -->
+  <div class="history-section">
+    <div class="history-header">
+      <span class="icon">📋</span>
+      <h3>历史公告</h3>
+    </div>
+    <ul class="history-list">
+      <li class="history-item" onclick="showNotice(1)">
+        <span class="item-date">2026-06-24</span>
+        <span class="item-title">新品上市！礼盒装整箱12瓶现已开放订购，送礼自用两相宜</span>
+        <span class="item-arrow">▶</span>
+      </li>
+      <li class="history-item" onclick="showNotice(2)">
+        <span class="item-date">2026-06-22</span>
+        <span class="item-title">贵州龙里5000亩刺梨种植基地顺利通过年度安全检查，原料更有保障</span>
+        <span class="item-arrow">▶</span>
+      </li>
+      <li class="history-item" onclick="showNotice(3)">
+        <span class="item-date">2026-06-20</span>
+        <span class="item-title">饮用提示：产品开封后请冷藏保存，沉淀为天然果肉成分，摇匀后饮用口感更佳</span>
+        <span class="item-arrow">▶</span>
+      </li>
+      <li class="history-item" onclick="showNotice(4)">
+        <span class="item-date">2026-06-18</span>
+        <span class="item-title">全国顺丰发货，48小时内发出，买整箱享优惠运费，欢迎批量订购洽谈合作</span>
+        <span class="item-arrow">▶</span>
+      </li>
+      <li class="history-item" onclick="showNotice(5)">
+        <span class="item-date">2026-06-15</span>
+        <span class="item-title">端午节特惠活动开启：满2件减20元，满5件赠定制手提袋，限时三天</span>
+        <span class="item-arrow">▶</span>
+      </li>
+    </ul>
+  </div>
+
+  <!-- 分页 -->
+  <div class="pagination">
+    <button class="btn" disabled>‹ 上一页</button>
+    <span class="page-num active">1</span>
+    <span class="page-num">2</span>
+    <button class="btn">下一页 ›</button>
+    <span class="page-info">第 1 / 2 页</span>
+  </div>
+
+</div>
+
+<!-- 页脚 -->
+<footer>
+  <p>© 2026 贵州得一健康管理有限公司 | 甄果黔荟品牌</p>
+  <p style="margin-top: 8px;"><a href="index.html">← 返回首页</a></p>
+</footer>
+
+<script>
+  // 点击历史公告切换到最新公告区展示详情
+  const noticeData = [
+    {
+      date: '2026-06-24',
+      title: '新品上市！礼盒装整箱12瓶现已开放订购，送礼自用两相宜',
+      content: '<p>甄果黔荟隆重推出精装礼盒版，内含12瓶340ml刺梨复合果蔬汁。礼盒采用环保材质，设计典雅大气，附赠品牌手提袋，是节日送礼、商务馈赠、亲友分享的理想之选。即日起通过微信商城及线下渠道同步发售，量大从优。</p><p>礼盒包装由国内知名设计团队操刀，以贵州苗绣元素为灵感，融合现代简约风格。每瓶独立卡槽固定，运输途中稳如磐石；箱体采用FSC认证环保纸板，践行绿色理念。</p>'
+    },
+    {
+      date: '2026-06-22',
+      title: '贵州龙里5000亩刺梨种植基地顺利通过年度安全检查，原料更有保障',
+      content: '<p>2026年5月，公司位于贵州龙里的5000亩刺梨标准化种植基地顺利通过农业农村部年度安全专项检查。基地采用有机种植标准，不使用化学合成农药，从源头保障原料纯净度。</p><p>检查组对基地土壤、水源、肥料、采收流程进行了全面评估，全部指标符合有机种植规范。目前基地年产刺梨鲜果约8000吨，可满足未来三年产能扩张需求。</p>'
+    },
+    {
+      date: '2026-06-20',
+      title: '饮用提示：产品开封后请冷藏保存，沉淀为天然果肉成分，摇匀后饮用口感更佳',
+      content: '<p>甄果黔荟刺梨复合果蔬汁采用物理压榨工艺，保留天然果肉纤维。产品开封后建议于0-4°C冷藏保存，并在24小时内饮用完毕。瓶底沉淀物为天然果肉与膳食纤维，属正常现象。</p><p>本品不含人工色素、香精及防腐剂，自然色泽随批次略有差异属正常情况。如发现胀瓶或异味，请勿饮用并联系客服处理。</p>'
+    },
+    {
+      date: '2026-06-18',
+      title: '全国顺丰发货，48小时内发出，买整箱享优惠运费，欢迎批量订购洽谈合作',
+      content: '<p>为保障产品新鲜度，甄果黔荟全线产品默认使用顺丰冷运配送，下单后48小时内安排发出，全国主要城市次日可达。购买整箱（12瓶）即享运费优惠。</p><p>目前支持全国31个省市自治区配送（港澳台地区暂未开通）。批量采购（50箱以上）可协商物流方案，欢迎致电客服热线或通过企业微信咨询。</p>'
+    },
+    {
+      date: '2026-06-15',
+      title: '端午节特惠活动开启：满2件减20元，满5件赠定制手提袋，限时三天',
+      content: '<p>为回馈广大消费者的支持与厚爱，甄果黔荟推出端午节限时特惠活动：单笔订单满2件立减20元，满5件赠送品牌定制手提袋一个（限量500个，赠完即止）。</p><p>活动时间：2026年6月22日至6月24日。活动期间所有订单均享受顺丰包邮服务，欢迎前往微信商城或合作门店选购。</p>'
+    }
+  ];
+
+  function showNotice(index) {
+    const data = noticeData[index - 1];
+    if (!data) return;
+    const latest = document.getElementById('latest');
+    latest.querySelector('.notice-date').innerHTML = '📅 ' + data.date;
+    latest.querySelector('h2').textContent = data.title;
+    latest.querySelector('.notice-content').innerHTML = data.content;
+    latest.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // 高亮动画
+    latest.style.animation = 'none';
+    setTimeout(() => { latest.style.animation = 'highlightPulse 1s ease-out'; }, 10);
+  }
+
+  // 页面加载：从首页跳转时根据hash定位
+  window.addEventListener('load', function () {
+    const hash = window.location.hash;
+    if (hash) {
+      // supports #n1~#n5
+      const idx = parseInt(hash.replace('#n', ''));
+      if (idx >= 1 && idx <= 5) {
+        setTimeout(() => showNotice(idx), 300);
+      }
+    }
+  });
+  window.addEventListener('scroll', function () {
+    const nav = document.querySelector('nav');
+    nav.style.boxShadow = window.scrollY > 60
+      ? '0 4px 24px rgba(0,0,0,0.1)'
+      : '0 2px 12px rgba(0,0,0,0.08)';
+  });
+</script>
+
+<style>
+  @keyframes highlightPulse {
+    0% { box-shadow: 0 8px 32px rgba(231,76,60,0.3); transform: scale(1.01); }
+    100% { box-shadow: 0 8px 32px rgba(231,76,60,0.12); transform: scale(1); }
+  }
+</style>
+
+</body>
+</html>
